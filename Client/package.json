@@ -1,0 +1,12 @@
+{
+  "name": "3314-assignment1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "../Client/GetImage.js",
+  "dependencies": {
+    "open": "^7.4.0"
+  },
+  "devDependencies": {},
+  "author": "Mona Sabeti",
+  "license": "ISC"
+}
