@@ -1,48 +1,59 @@
-// You may need to add some statements here
+// import statement
 let singleton = require('../Server/Singleton');
 
+// stores the header length which is always 12 bytes
+const header_length = 12;
+
 module.exports = {
-  init: function (imageName, imageType) {
-    // feel free to add function parameters as needed
-    //
-    // enter your code here
-    //
-    this.imageName = imageName;
-    this.imageType = imageType; // You should have a function or a map to convert file extension to IT value.
-    this.version = 9;
-    this.timeStamp = singleton.getTimestamp(); // Assume this function exists and returns a 32-bit value.
-    console.log(singleton.getTimestamp())
-  },
+    // initializes the module with the given image name, image type, version, request type, and the time stamp
+    init: function (imageName, imageType) {
+      // version is 9 by default
+      this.version = 9;
+      // request type is 0 since client wants to 'Query'
+      this.requestType = 0;
+      // gets the timestamp from singleton
+      this.timeStamp = singleton.getTimestamp();
+      this.imageType = imageType;
+      this.imageName = imageName;
+    },
 
   //--------------------------
   //getBytePacket: returns the entire packet in bytes
   //--------------------------
   getBytePacket: function () {
-    // enter your code here
+
+    // stores image name size
     let imageNameSize = this.imageName.length;
-    let packetSize = 12 + imageNameSize; // Header is 12 bytes, rest is the image name size.
-    let packet = Buffer.alloc(packetSize);
 
-    // Store version (4 bits) and request type (2 bits) in the first byte
+    // creates a packet with the length of the entire packet (header and payload)
+    let packet = Buffer.alloc(header_length + imageNameSize);
+
+    // stores the version which is 4 bits first in the packet
     storeBitPacket(packet, this.version, 0, 4);
-    storeBitPacket(packet, 0, 4, 2); // Request type is 0 for 'Query'
-    // The next 26 bits are reserved and already set to 0 by Buffer.alloc
 
-    // Store timestamp (32 bits)
+    // the next 26 bits are reserved so we will skip them
+
+    // stores the request type which is 2 bits next in the packet
+    storeBitPacket(packet, this.requestType, 30, 2);
+
+    // stores the timestamp which is 32 bits next in the packet 
     storeBitPacket(packet, this.timeStamp, 32, 32);
 
-    // Store image type (4 bits)
+    // stores the image type which is 4 bits next in the packet 
     storeBitPacket(packet, this.imageType, 64, 4);
 
-    // Store image file name size (28 bits)
+    // stores the image name size which is 28 bits next in the packet
     storeBitPacket(packet, imageNameSize, 68, 28);
 
-    // Append the image file name at the end of the packet
+    // converts the image name to bytes and stores in an array
     let imageNameBytes = stringToBytes(this.imageName);
+
+    // adds each byte of the image name to the packet as the payload (after the 12 byte header)
     imageNameBytes.forEach((byte, i) => {
       packet[12 + i] = byte;
     });
 
+    // returns the created packet 
     return packet;
   },
 };

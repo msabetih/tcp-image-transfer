@@ -52,10 +52,10 @@ module.exports = {
             }
 
             // Prints all the information about the request packet to the server console
-            console.log(`Client-932 is connected at timestamp: 931\n`);
+            console.log(`\nClient-${timeStamp} is connected at timestamp: ${timeStamp}\n`);
             console.log(`ITP packet received: `)
             printPacketBit(data);
-            console.log(`\nClient-931 requests:`)
+            console.log(`\nClient-${timeStamp} requests:`)
             console.log(`\t--ITP version: ${version}`)
             console.log(`\t--Timestamp: ${timeStamp}`)
             console.log(`\t--Request type: ${requestType}`)
@@ -95,7 +95,7 @@ module.exports = {
 
                     // closes the socket connection with the client (keep in mind the server is still running to more requests can be recieved)
                     sock.end()
-                    console.log(`\nClient-931 closed the connection`)
+                    console.log(`\nClient-${timeStamp} closed the connection`)
                 });
             }
 
@@ -103,7 +103,7 @@ module.exports = {
             else {
                 console.log("Invalid ITP request received.");
                 sock.end();
-                console.log(`\nClient-931 closed the connection`)
+                console.log(`\nClient-${timeStamp} closed the connection`)
             }
         });
     }
