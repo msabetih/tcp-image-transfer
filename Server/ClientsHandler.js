@@ -51,6 +51,23 @@ module.exports = {
                 fileExtension = 'raw';
             }
 
+            // creates variable to store the value of the response type
+            let requestValue = '';
+
+            // assigns the response value based on the response type 
+            if(requestType == 0){
+                requestValue = "Query";
+            }
+            else if(requestType == 1){
+                requestValue = "Found";
+            }
+            else if(requestType == 2){
+                requestValue = "Not Found";
+            }
+            else if(requestType == 3){
+                requestValue = "Busy";
+            }
+
             // Prints all the information about the request packet to the server console
             console.log(`\nClient-${timeStamp} is connected at timestamp: ${timeStamp}\n`);
             console.log(`ITP packet received: `)
@@ -58,7 +75,7 @@ module.exports = {
             console.log(`\nClient-${timeStamp} requests:`)
             console.log(`\t--ITP version: ${version}`)
             console.log(`\t--Timestamp: ${timeStamp}`)
-            console.log(`\t--Request type: ${requestType}`)
+            console.log(`\t--Request type: ${requestValue}`)
             console.log(`\t--Image file extension(s): ${fileExtension}`)
             console.log(`\t--Image file name: ${imageName}`)
 
