@@ -40,10 +40,10 @@ client.on('data', (data) => {
   let header = data.slice(0, 12);
   console.log("ITP packet header received:");
   printPacketBit(header);
-  printPacketBit(data.slice(0, 36));
 
   // Parse the response header to extract the image size
   let imageSize = parseBitPacket(data, 64, 32);
+  console.log(imageSize)
   let imageBuffer = Buffer.alloc(imageSize);
 
   // Copy the image data from the response packet's payload

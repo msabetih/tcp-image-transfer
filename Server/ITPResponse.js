@@ -37,6 +37,9 @@ module.exports = {
         // stores the image size which is 32 bits long, next in the packet
         storeBitPacket(packet, imageSize, 64, 32);
 
+        // Append the image data at the end of the packet
+        imageData.copy(packet, header_length);
+
         return packet;
     }
 };

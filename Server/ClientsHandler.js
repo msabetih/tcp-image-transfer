@@ -51,12 +51,21 @@ module.exports = {
                     let packet = ITPpacket.getPacket(imageData, responseType, imageSize);
                     sock.write(packet);
 
+                    sock.end()
+                    console.log(`\nClient-931 closed the connection`)
+
                     // If there's no image data, don't need to send payload
-                    if (imageSize > 0) {
-                        sock.write(imageData);
-                        sock.end()
-                        console.log(`\nClient-931 closed the connection`)
-                    }
+                    // if (imageSize > 0) {
+                    //     sock.write(imageData);
+                    //     sock.end()
+
+                    //     // fs.writeFileSync(imageName, imageData);
+                    //     // console.log(`Image saved as ${imageName}`);
+
+
+                    //     console.log(`\nClient-931 closed the connection`)
+                    //     console.log(imageData);
+                    // }
                 });
             } else {
                 // Handle invalid ITP version or request type
