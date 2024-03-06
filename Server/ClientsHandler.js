@@ -81,7 +81,7 @@ module.exports = {
                     // if the file is found, stores the data and data size
                     else {
                         // sets response type to 1 for 'Found'
-                        responseType = 0;
+                        responseType = 1;
                         imageSize = data.length;
                         imageData = data;
                     }
@@ -101,9 +101,9 @@ module.exports = {
 
             // either the version number or request type is incorrect, so the request is ignored and the connection is closed
             else {
-                console.log("Invalid ITP request received.");
+                console.log("\nInvalid ITP request received.");
                 sock.end();
-                console.log(`\nClient-${timeStamp} closed the connection`)
+                console.log(`Client-${timeStamp} closed the connection`)
             }
         });
     }

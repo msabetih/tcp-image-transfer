@@ -6,9 +6,8 @@ const header_length = 12;
 
 module.exports = {
     // initializes the module with the given image name, image type, version, request type, and the time stamp
-    init: function (imageName, imageType) {
-      // version is 9 by default
-      this.version = 9;
+    init: function (imageName, imageType, version) {
+      this.version = version;
       // request type is 0 since client wants to 'Query'
       this.requestType = 0;
       // gets the timestamp from singleton
