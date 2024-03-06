@@ -1,45 +1,46 @@
 
-// You may need to add some statements here
+// import statement
 let singleton = require('./Singleton');
 
-// stores the header length which is 12 bytes
+// stores the header length which is always 12 bytes
 const header_length = 12;
 
 module.exports = {
 
-    init: function () { // feel free to add function parameters as needed
-        //
-        // enter your code here
-        //
+    // initializes the module with given image data, response type, and image size
+    init: function (imageData, responseType, imageSize) {
+        this.imageData = imageData;
+        this.responseType = responseType;
+        this.imageSize = imageSize;
     },
 
     //--------------------------
     //getpacket: returns the entire packet
     //--------------------------
-    getPacket: function (imageData, responseType, imageSize) {
-        // enter your code here
+    getPacket: function () {
 
         // creates a packet with the length of the entire packet (header and payload)
-        let packet = Buffer.alloc(header_length + imageData.length)
+        let packet = Buffer.alloc(header_length + this.imageData.length)
 
-        // stores the version number '9' which is 4 bits first in the packet
+        // stores the version number '9' which is 4 bits, stored first in the packet
         storeBitPacket(packet, 9, 0, 4);
 
-        // stores the response type which is 2 bits long, next in the packet 
-        storeBitPacket(packet, responseType, 4, 2);
+        // stores the response type which is 2 bits, stored next in the packet 
+        storeBitPacket(packet, this.responseType, 4, 2);
 
-        // stores the sequence number which is 26 bits long, next in the packet
+        // stores the sequence number which is 26 bits, stored next in the packet
         storeBitPacket(packet, singleton.getSequenceNumber(), 6, 26);
 
-        // stores the time stamp which is 32 bits long, next in the packet
+        // stores the time stamp which is 32 bits, stored next in the packet
         storeBitPacket(packet, singleton.getTimestamp(), 32, 32);
 
-        // stores the image size which is 32 bits long, next in the packet
-        storeBitPacket(packet, imageSize, 64, 32);
+        // stores the image size which is 32 bits, stored next in the packet
+        storeBitPacket(packet, this.imageSize, 64, 32);
 
-        // Append the image data at the end of the packet
-        imageData.copy(packet, header_length);
+        // adds the image data as the payload to the end of the packet (following the header)
+        this.imageData.copy(packet, header_length);
 
+        // returns the created packet
         return packet;
     }
 };

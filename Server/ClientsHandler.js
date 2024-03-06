@@ -1,76 +1,109 @@
+// import statements
 let ITPpacket = require('./ITPResponse');
 let fs = require("fs");
 
-// You may need to add some statements here
-
-
 module.exports = {
 
+    // function which handles incoming connections from the client
     handleClientJoining: function (sock) {
-        //
-        // Enter your code here
-        //
-        // you may need to develop some helper functions
-        // that are defined outside this export block
+       
+        // listens for request packets coming from the client on the socket connection
         sock.on('data', (data) => {
-            // Assume the ITP request packet structure follows the provided specification
-            let version = parseBitPacket(data, 0, 4);
-            let requestType = parseBitPacket(data, 4, 2);
-            let imageNameSize = parseBitPacket(data, 60, 28);
-            let imageName = bytesToString(data.slice(12, 12 + imageNameSize));
-            let responseType, imageData, imageSize;
 
+            // extracts the version from the packet
+            let version = parseBitPacket(data, 0, 4);
+            
+            // extracts the request type from the packet (always 0 for this lab since client wants to 'Query')
+            let requestType = parseBitPacket(data, 30, 2);
+            
+            // extracts the timestamp from the packet
+            let timeStamp = parseBitPacket(data, 32, 32)
+            
+            // extracts the image type from the packet
+            let imageType = parseBitPacket(data, 64, 4);
+
+            // extracts the image name size from the packet
+            let imageNameSize = parseBitPacket(data, 68, 28);
+
+            // extracts the image name from the packet (payload directly after the 12 byte header) and converts to a string 
+            let imageName = bytesToString(data.slice(12, 12 + imageNameSize));
+            
+            // initializes the file extension
+            let fileExtension = '';
+
+            // sets the file extension based on the image type 
+            if(imageType == 1){
+                fileExtension = 'png';
+            }
+            else if(imageType == 2){
+                fileExtension = 'bmp';
+            }
+            else if(imageType == 3){
+                fileExtension = 'tiff';
+            }
+            else if(imageType == 4){
+                fileExtension = 'jpeg';
+            }
+            else if(imageType == 5){
+                fileExtension = 'gif';
+            }
+            else if(imageType == 15){
+                fileExtension = 'raw';
+            }
+
+            // Prints all the information about the request packet to the server console
             console.log(`Client-932 is connected at timestamp: 931\n`);
             console.log(`ITP packet received: `)
             printPacketBit(data);
-
             console.log(`\nClient-931 requests:`)
             console.log(`\t--ITP version: ${version}`)
-            console.log(`\t--Timestamp:`)
+            console.log(`\t--Timestamp: ${timeStamp}`)
             console.log(`\t--Request type: ${requestType}`)
-            console.log(`\t--Image file extension(s) ${imageName}`)
+            console.log(`\t--Image file extension(s): ${fileExtension}`)
             console.log(`\t--Image file name: ${imageName}`)
 
+            // creates variables needed to create the response packet
+            let responseType, imageData, imageSize;
 
-            // Check version and requestType
-            if (version === 9 && requestType === 0) { // 0 for 'Query'
-                fs.readFile(`./images/${imageName}.gif`, (err, data) => {
+            // makes sure the version number is 9 and the request type is 0 before proceeding
+            if (version === 9 && requestType === 0) {
+
+                // reads the image file requested from the images folder
+                fs.readFile(`./images/${imageName}.${fileExtension}`, (err, data) => {
+
+                    // if the file was not found an error occurs
                     if (err) {
-                        console.log(err);
-                        // If the image doesn't exist, send 'Not found' response
-                        responseType = 1; // Assuming 'Not found' is indicated by '1'
+                        // sets response type to 2 for 'Not Found'
+                        responseType = 2;
                         imageSize = 0;
                         imageData = Buffer.alloc(0);
-                    } else {
-                        // If the image exists, send it with the 'Found' response
-                        responseType = 0; // Assuming 'Found' is indicated by '0'
+                    } 
+                    // if the file is found, stores the data and data size
+                    else {
+                        // sets response type to 1 for 'Found'
+                        responseType = 0;
                         imageSize = data.length;
                         imageData = data;
                     }
 
-                    let packet = ITPpacket.getPacket(imageData, responseType, imageSize);
+                    // creates the response packet
+                    ITPpacket.init(imageData, responseType, imageSize);
+                    let packet = ITPpacket.getPacket();
+
+                    // sends the response packet through the socket to the client
                     sock.write(packet);
 
+                    // closes the socket connection with the client (keep in mind the server is still running to more requests can be recieved)
                     sock.end()
                     console.log(`\nClient-931 closed the connection`)
-
-                    // If there's no image data, don't need to send payload
-                    // if (imageSize > 0) {
-                    //     sock.write(imageData);
-                    //     sock.end()
-
-                    //     // fs.writeFileSync(imageName, imageData);
-                    //     // console.log(`Image saved as ${imageName}`);
-
-
-                    //     console.log(`\nClient-931 closed the connection`)
-                    //     console.log(imageData);
-                    // }
                 });
-            } else {
-                // Handle invalid ITP version or request type
+            }
+
+            // either the version number or request type is incorrect, so the request is ignored and the connection is closed
+            else {
                 console.log("Invalid ITP request received.");
                 sock.end();
+                console.log(`\nClient-931 closed the connection`)
             }
         });
     }

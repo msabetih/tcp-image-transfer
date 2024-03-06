@@ -18,7 +18,7 @@ let version = process.argv[7];
 //console.log(imageName.split('.')[1]);
 
 // Initialize the ITP request packet with the image name and version
-ITPpacket.init('Rose', 5);
+ITPpacket.init('Dog', 4);
 let queryPacket = ITPpacket.getBytePacket();
 
 console.log(queryPacket)

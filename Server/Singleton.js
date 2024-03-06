@@ -1,9 +1,7 @@
 
-// Some code need to be added here, that are common for the module
-
-// initialize the time stamp variable 
+// initializes the time stamp variable 
 let timeStamp = 0;
-// initialize the sequence number variable
+// initializes the sequence number variable
 let sequenceNumber = 0
 
 module.exports = {
