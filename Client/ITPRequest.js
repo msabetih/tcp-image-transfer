@@ -1,11 +1,17 @@
 // You may need to add some statements here
+let singleton = require('../Server/Singleton');
 
 module.exports = {
-  init: function () {
+  init: function (imageName, imageType) {
     // feel free to add function parameters as needed
     //
     // enter your code here
     //
+    this.imageName = imageName;
+    this.imageType = imageType; // You should have a function or a map to convert file extension to IT value.
+    this.version = 9;
+    this.timeStamp = singleton.getTimestamp(); // Assume this function exists and returns a 32-bit value.
+    console.log(singleton.getTimestamp())
   },
 
   //--------------------------
@@ -13,7 +19,31 @@ module.exports = {
   //--------------------------
   getBytePacket: function () {
     // enter your code here
-    return "this should be a correct packet";
+    let imageNameSize = this.imageName.length;
+    let packetSize = 12 + imageNameSize; // Header is 12 bytes, rest is the image name size.
+    let packet = Buffer.alloc(packetSize);
+
+    // Store version (4 bits) and request type (2 bits) in the first byte
+    storeBitPacket(packet, this.version, 0, 4);
+    storeBitPacket(packet, 0, 4, 2); // Request type is 0 for 'Query'
+    // The next 26 bits are reserved and already set to 0 by Buffer.alloc
+
+    // Store timestamp (32 bits)
+    storeBitPacket(packet, this.timeStamp, 32, 32);
+
+    // Store image type (4 bits)
+    storeBitPacket(packet, this.imageType, 64, 4);
+
+    // Store image file name size (28 bits)
+    storeBitPacket(packet, imageNameSize, 68, 28);
+
+    // Append the image file name at the end of the packet
+    let imageNameBytes = stringToBytes(this.imageName);
+    imageNameBytes.forEach((byte, i) => {
+      packet[12 + i] = byte;
+    });
+
+    return packet;
   },
 };
 
