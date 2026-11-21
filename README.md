@@ -55,6 +55,11 @@ node GetImage.js -s 127.0.0.1:3000 -q Dog.jpeg -v 9
 
 The downloaded image is saved in the `Client` directory and opened automatically. Other available filenames can be found in [`Server/images`](Server/images).
 
+## Sample Run
+<img width="408" height="272" alt="Screenshot 2026-11-21 at 6 07 26 PM" src="https://github.com/user-attachments/assets/7e4124d1-07c5-46e6-b375-b551a0023243" />
+
+<img width="702" height="643" alt="Screenshot 2026-11-21 at 6 07 36 PM" src="https://github.com/user-attachments/assets/8d5db305-0c4a-4d15-8755-6b2cea826718" />
+
 ## Protocol overview
 
 ITP uses a 12-byte header followed by an optional payload. A request identifies the protocol version, request type, timestamp, image format, and image name. A response identifies whether the image was found and includes a sequence number, timestamp, image size, and—when successful—the image bytes.
