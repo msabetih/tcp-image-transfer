@@ -37,7 +37,7 @@ Install the dependencies in both directories:
 cd Server
 npm install
 
-cd ../Client
+cd Client
 npm install
 ```
 
